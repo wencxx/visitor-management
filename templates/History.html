@@ -1,0 +1,77 @@
+{% extends './Base.html' %}
+
+{% block content %}
+    <div class="h-[93dvh] font-Inter w-screen flex flex-col items-center justify-center gap-y-8">
+        <div class="w-3/4 h-3/4 p-5 space-y-5 bg-white rounded-md shadow overflow-y-auto">
+            <h1 class="font-medium text-xl uppercase text-center">History Logs</h1>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul>
+                    {% for category, message in messages %}
+                        <li class="{{ category }} bg-green-500 text-white py-1 rounded pl-2">{{ message }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+            <table class="w-full ">
+                <thead>
+                    <tr>
+                        <th class="border py-1 w-2/12">Name</th>
+                        <th class="border py-1 w-1/12">Gender</th>
+                        <th class="border py-1 w-1/12">Age</th>
+                        <th class="border py-1 w-1/12">Contact</th>
+                        <th class="border py-1 w-2/12">Purpose</th>
+                        <th class="border py-1 w-2/12">Visited Student</th>
+                        <th class="border py-1 w-1/12">Checked-in</th>
+                        <th class="border py-1 w-1/12">Checked-out</th>
+                        <th class="border py-1 w-1/12">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                        <tr>
+                            <td class="border text-center py-1">{{ log.name }}</td>
+                            <td class="border text-center py-1">{{ log.gender }}</td>
+                            <td class="border text-center py-1">{{ log.age }}</td>
+                            <td class="border text-center py-1">{{ log.contact }}</td>
+                            <td class="border text-center py-1">{{ log.purpose }}</td>
+                            <td class="border text-center py-1">{{ log.toMeet }}</td>
+                            <td class="border text-center py-1">{{ log.checkIn | format_datetime }}</td>
+                            <td class="border text-center py-1">{{ log.checkOut | format_datetime }}</td>
+                            <td class="border text-center py-1">
+                                {% if not log.checkOut %}
+                                    <form action="{{ url_for('history') }}" method="post">
+                                        <input type="hidden" name="log_id" value="{{ log.id }}">
+                                        <input type="datetime-local" class="hidden" name="checkedOut" value="" id="checkedOut">
+                                        <button class="bg-red-500 text-white rounded px-3 py-1">Checkout</button>
+                                    </form>
+                                {% else %}
+                                    ---
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+<script>
+    const phtDate = new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" });
+    const phtDateObj = new Date(phtDate);
+
+    // Format the date in YYYY-MM-DDTHH:MM format
+    const year = phtDateObj.getFullYear();
+    const month = String(phtDateObj.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+    const day = String(phtDateObj.getDate()).padStart(2, '0');
+    const hours = String(phtDateObj.getHours()).padStart(2, '0');
+    const minutes = String(phtDateObj.getMinutes()).padStart(2, '0');
+
+    const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}`;
+
+    // Set the default value of the input
+    document.getElementById('checkedOut').value = formattedDate;
+</script>
+{% endblock %}

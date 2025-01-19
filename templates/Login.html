@@ -1,0 +1,69 @@
+{% extends './Base.html' %}
+
+{% block content %}
+    <div class="h-screen w-screen flex items-center justify-center">
+        <div class="w-3/5 h-full hidden lg:block">
+            <img src="{{ url_for('static', filename='images/hero.jpg') }}" alt="hero" class="w-full h-full">
+        </div>
+        <div class="w-full lg:w-2/5 bg-white h-full p-10 flex flex-col items-center justify-center space-y-14">
+            <img src="{{ url_for('static', filename='images/logo.png ') }}" alt="logo" class="w-24 aspect-square">
+            <form action="{{ url_for('login') }}" method="post" class="space-y-5 w-3/4">
+                <h1 class="font-Inter text-center text-neutral-900 font-bold text-5xl tracking-wide">Welcome back!</h1>
+                <p class="text-center font-Inter text-lg text-gray-600">Please enter your login credentials</p>
+                <div class="!mt-20 font-Inter space-y-10">
+                  {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <ul>
+                        {% for category, message in messages %}
+                            <li class="{{ category }} bg-green-500 text-white py-1 rounded pl-2">{{ message }}</li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                  {% endwith %}
+                    <div>
+                        <div class="flex items-center justify-center w-full">
+                          <div class="relative w-full">
+                            <input
+                              id="email"
+                              name="email"
+                              type="text"
+                              placeholder=""
+                              class="border-b border-gray-300 w-full py-1 focus:border-b-2 focus:border-primary transition-colors focus:outline-none peer bg-inherit"
+                              required
+                            />
+                            <label
+                              for="email"
+                              class="absolute -top-4 text-xl left-0 cursor-text peer-focus:text-xs peer-focus:-top-4 transition-all peer-focus:text-primary peer-placeholder-shown:-top-1 peer-placeholder-shown:text-xl"
+                            >
+                              Email
+                            </label>
+                          </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-center w-full">
+                          <div class="relative w-full">
+                            <input
+                              id="password"
+                              name="password"
+                              type="password"
+                              placeholder=""
+                              class="border-b border-gray-300 w-full py-1 focus:border-b-2 focus:border-primary transition-colors focus:outline-none peer bg-inherit"
+                              required
+                            />
+                            <label
+                              for="password"
+                              class="absolute -top-4 text-xl left-0 cursor-text peer-focus:text-xs peer-focus:-top-4 transition-all peer-focus:text-primary peer-placeholder-shown:-top-1 peer-placeholder-shown:text-xl"
+                            >
+                              Password
+                            </label>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="!mt-1 flex justify-between"><span>Don't have an account yet?</span> <a href="{{ url_for('register') }}" class="text-primary hover:underline cursor-pointer">Register</a> </p>
+                <button class="w-full bg-primary text-white rounded-full py-2 !mt-14 text-lg">Login</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

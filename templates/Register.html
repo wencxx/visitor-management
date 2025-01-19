@@ -1,0 +1,77 @@
+{% extends './Base.html' %}
+
+{% block content %}
+    <div class="h-screen w-screen flex items-center justify-center">
+        <div class="w-3/5 h-full hidden lg:block">
+            <img src="{{ url_for('static', filename='images/hero.jpg') }}" alt="hero" class="w-full h-full">
+        </div>
+        <div class="w-full lg:w-2/5 bg-white h-full p-10 flex flex-col items-center justify-center space-y-14">
+            <img src="{{ url_for('static', filename='images/logo.png ') }}" alt="logo" class="w-24 aspect-square">
+            <form action="{{ url_for('register') }}" method="post" class="space-y-5 w-3/4">
+                <h1 class="font-Inter text-center text-neutral-900 font-bold text-5xl tracking-wide">Visitors Registration!</h1>
+                <p class="text-center font-Inter text-lg text-gray-600">Please provide required details.</p>
+                <div class="!mt-20 font-Inter space-y-10">
+                    <div>
+                        <div class="flex items-center justify-center w-full">
+                          <div class="relative w-full">
+                            <input
+                              id="username"
+                              name="name"
+                              type="text"
+                              placeholder=""
+                              class="border-b border-gray-300 w-full py-1 focus:border-b-2 focus:border-primary transition-colors focus:outline-none peer bg-inherit"
+                            />
+                            <label
+                              for="username"
+                              class="absolute -top-4 text-xl left-0 cursor-text peer-focus:text-xs peer-focus:-top-4 transition-all peer-focus:text-primary peer-placeholder-shown:-top-1 peer-placeholder-shown:text-xl"
+                            >
+                              Full Name
+                            </label>
+                          </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-center w-full">
+                          <div class="relative w-full">
+                            <input
+                              id="email"
+                              name="email"
+                              type="email"
+                              placeholder=""
+                              class="border-b border-gray-300 w-full py-1 focus:border-b-2 focus:border-primary transition-colors focus:outline-none peer bg-inherit"
+                            />
+                            <label
+                              for="email"
+                              class="absolute -top-4 text-xl left-0 cursor-text peer-focus:text-xs peer-focus:-top-4 transition-all peer-focus:text-primary peer-placeholder-shown:-top-1 peer-placeholder-shown:text-xl"
+                            >
+                              Email
+                            </label>
+                          </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-center w-full">
+                          <div class="relative w-full">
+                            <input
+                              id="password"
+                              name="password"
+                              type="password"
+                              placeholder=""
+                              class="border-b border-gray-300 w-full py-1 focus:border-b-2 focus:border-primary transition-colors focus:outline-none peer bg-inherit"
+                            />
+                            <label
+                              for="password"
+                              class="absolute -top-4 text-xl left-0 cursor-text peer-focus:text-xs peer-focus:-top-4 transition-all peer-focus:text-primary peer-placeholder-shown:-top-1 peer-placeholder-shown:text-xl"
+                            >
+                              Password
+                            </label>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="!mt-1 flex justify-between"><span>Alreadu have an account?</span> <a href="{{ url_for('login') }}" class="text-primary hover:underline cursor-pointer">Login</a> </p>
+                <button class="w-full bg-primary text-white rounded-full py-2 !mt-14 text-lg">Register</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

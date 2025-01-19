@@ -1,0 +1,12 @@
+{% extends './Base.html' %}
+
+{% block content %}
+    <div class="h-[93dvh] font-Inter w-screen flex flex-col items-center justify-center gap-y-8">
+        <div class="flex -mt-[7dvh]">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="logo" class="w-52 aspect-square">
+            <img src="{{ url_for('static', filename='images/logo2.png') }}" alt="logo2" class="w-52 aspect-square">
+        </div>
+        <h1 class="text-5xl tracking-wide font-semibold uppercase">Welcome to visitors management system</h1>
+        <p class="w-3/5 text-gray-600 text-center text-xl">A contemporary solution built to replace traditional logbooks with an efficient digital system. Our platform allows you to check in, check out, and monitor your visit history, improving security, accountability, and convenience.</p>
+    </div>
+{% endblock %}
