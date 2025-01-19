@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, flash, redirect, url_for, session
+from flask import Flask, render_template, request, flash, redirect, url_for, session, Response
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import desc
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import os
@@ -88,12 +89,13 @@ def login():
 
         session['user_id'] = user.id
         session['user_name'] = user.name
+        session['user_role'] = user.role
         
         # check if user is admin or not and redirects them to their side
         if user.role == 'user':
             return redirect(url_for('home'))  
         else:
-            return redirect(url_for('register'))  
+            return redirect(url_for('admin'))  
 
 
     return render_template('login.html')
@@ -129,7 +131,7 @@ def history():
         else:
             flash('Log not found or you do not have permission to update it.', 'error')
 
-    logs = visit_logs.query.filter(visit_logs.user_id == userID).all()
+    logs = visit_logs.query.filter(visit_logs.user_id == userID).order_by(desc(visit_logs.checkIn)).all()
 
     return render_template('History.html', logs=logs)
  
@@ -163,6 +165,53 @@ def checkin():
     userName = session.get('user_name')
 
     return render_template('CheckIn.html', userName=userName)
+
+#admin dashboard route
+@app.route('/admin', methods=['GET', 'POST'])
+def admin():
+    if 'user_id' not in session:
+        flash('You need to log in to access this page!', 'error')
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        log = visit_logs.query.get(request.form.get('log_id'))
+        db.session.delete(log)
+        db.session.commit()
+        flash('Deleted log successfully!', 'success')
+
+    logs = visit_logs.query.order_by(desc(visit_logs.checkIn)).all()
+
+    return render_template('Admin.html', logs=logs)
+
+# generate csv
+@app.route('/download-csv')
+def download_csv():
+    logs = visit_logs.query.all()
+
+    csv_data = [
+        {
+            "Name": log.name,
+            "Gender": log.gender,
+            "Age": log.age,
+            "Contact": log.contact,
+            "Purpose": log.purpose,
+            "Visited Student": log.toMeet,
+            "Checked-in": log.checkIn,
+            "Checked-out": log.checkOut,
+        }
+        for log in logs
+    ]
+
+    def generate_csv():
+        yield ",".join(csv_data[0].keys()) + "\n" 
+        for row in csv_data:
+            yield ",".join(str(value) for value in row.values()) + "\n"
+
+    return Response(
+        generate_csv(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment;filename=history_logs.csv"}
+    )
 
 # logout
 @app.route('/logout')

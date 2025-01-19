@@ -1,0 +1,96 @@
+{% extends './Base.html' %}
+
+{% block content %}
+    <div class="h-[93dvh] w-5/6 flex items-center justify-center font-Inter">
+        <div class="bg-white rounded-md shadow h-3/4 w-5/6 p-5 space-y-2">
+            <div class="flex items-center justify-between">
+                <h1 class="text-lg font-medium">History Logs</h1>
+                <a href="{{ url_for('download_csv')}}" class="bg-green-500 px-2 text-white rounded py-1">Generate CSV</a>
+            </div>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul>
+                    {% for category, message in messages %}
+                        <li class="{{ category }} bg-green-500 text-white py-1 rounded pl-2">{{ message }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+            <table class="w-full ">
+                <thead>
+                    <tr>
+                        <th class="border py-1 w-2/12">Name</th>
+                        <th class="border py-1 w-1/12">Gender</th>
+                        <th class="border py-1 w-1/12">Age</th>
+                        <th class="border py-1 w-1/12">Contact</th>
+                        <th class="border py-1 w-2/12">Purpose</th>
+                        <th class="border py-1 w-2/12">Visited Student</th>
+                        <th class="border py-1 w-1/12">Checked-in</th>
+                        <th class="border py-1 w-1/12">Checked-out</th>
+                        <th class="border py-1 w-1/12">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if logs.len %}
+                        {% for log in logs %}
+                            <tr>
+                                <td class="border text-center py-1">{{ log.name }}</td>
+                                <td class="border text-center py-1">{{ log.gender }}</td>
+                                <td class="border text-center py-1">{{ log.age }}</td>
+                                <td class="border text-center py-1">{{ log.contact }}</td>
+                                <td class="border text-center py-1">{{ log.purpose }}</td>
+                                <td class="border text-center py-1">{{ log.toMeet }}</td>
+                                <td class="border text-center py-1">{{ log.checkIn | format_datetime }}</td>
+                                <td class="border text-center py-1">{{ log.checkOut | format_datetime }}</td>
+                                <td class="border text-center py-1">
+                                    <form action="{{ url_for('admin') }}" method="post" class="hidden">
+                                        <input type="hidden" name="log_id" value="{{ log.id }}" id="logId">
+                                        <button id="submit_button">Delete</button>
+                                    </form>
+                                    <button onclick="showModal()" class="bg-red-500 text-white rounded px-3 py-1">Delete</button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td class="border text-center py-1" colspan="9">No logs to show</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+        <!-- confirmation modal -->
+        <div class="absolute top-0 left-0 w-screen h-screen bg-black/25 hidden items-center justify-center" id="modal">
+            <div class="w-full bg-white max-w-md h-fit space-y-5 rounded-md shadow flex flex-col items-center justify-center p-10">
+                <svg xmlns="http://www.w3.org/2000/svg" height="100px" viewBox="0 -960 960 960" width="100px" fill=" #f97316"><path d="m40-120 440-760 440 760H40Zm138-80h604L480-720 178-200Zm302-40q17 0 28.5-11.5T520-280q0-17-11.5-28.5T480-320q-17 0-28.5 11.5T440-280q0 17 11.5 28.5T480-240Zm-40-120h80v-200h-80v200Zm40-100Z"/></svg>
+                <h1 class="text-xl font-medium">Do you want to proceed?</h1>
+                <div class="w-full flex gap-x-5 !mt-14">
+                    <button class="bg-red-500 w-1/2 py-1 text-white rounded" onclick="showModal()">No</button>
+                    <button class="bg-green-500 w-1/2 py-1 text-white rounded" onclick="deleteLog()">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+<script>
+const modal = document.querySelector('#modal')
+const submitButton = document.querySelector('#submit_button')
+
+const showModal = () => {
+    if (modal.classList.contains('hidden')) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    } else {
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+    }
+}
+
+const deleteLog = () => {
+    submitButton.click()
+}
+
+</script>
+{% endblock %}
