@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash, redirect, url_for, session, Response
+from flask import Flask, render_template, request, flash, redirect, url_for, session, Response, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import desc
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -49,6 +49,11 @@ class Notifications(db.Model):
     message = db.Column(db.String(100), nullable=False)
     isRead = db.Column(db.Boolean, nullable=False, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+@app.route('/unread_count', methods=['GET'])
+def get_unread_count():
+    unread_count = Notifications.query.filter_by(isRead=False).count()
+    return jsonify({'unread_count': unread_count})
 
 # Register route
 @app.route('/register', methods=['GET', 'POST'])
@@ -236,6 +241,9 @@ def notifications():
         db.session.delete(log)
         db.session.commit()
         flash('Deleted notifications successfully!', 'success')
+
+    Notifications.query.filter_by(isRead=False).update({'isRead': True})
+    db.session.commit()
 
     notifications = Notifications.query.all()
 
