@@ -19,32 +19,18 @@
             <table class="w-full ">
                 <thead>
                     <tr>
-                        <th class="border py-1 w-2/12">Name</th>
-                        <th class="border py-1 w-1/12">Gender</th>
-                        <th class="border py-1 w-1/12">Age</th>
-                        <th class="border py-1 w-1/12">Contact</th>
-                        <th class="border py-1 w-2/12">Purpose</th>
-                        <th class="border py-1 w-2/12">Visited Student</th>
-                        <th class="border py-1 w-1/12">Checked-in</th>
-                        <th class="border py-1 w-1/12">Checked-out</th>
+                        <th class="border py-1 w-2/12">Message</th>
                         <th class="border py-1 w-1/12">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% if logs %}
-                        {% for log in logs %}
+                    {% if notifications %}
+                        {% for notif in notifications %}
                             <tr>
-                                <td class="border text-center py-1">{{ log.name }}</td>
-                                <td class="border text-center py-1">{{ log.gender }}</td>
-                                <td class="border text-center py-1">{{ log.age }}</td>
-                                <td class="border text-center py-1">{{ log.contact }}</td>
-                                <td class="border text-center py-1">{{ log.purpose }}</td>
-                                <td class="border text-center py-1">{{ log.toMeet }}</td>
-                                <td class="border text-center py-1">{{ log.checkIn | format_datetime }}</td>
-                                <td class="border text-center py-1">{{ log.checkOut | format_datetime }}</td>
+                                <td class="border text-center py-1">{{ notif.message }}</td>
                                 <td class="border text-center py-1">
-                                    <form action="{{ url_for('admin') }}" method="post" class="hidden">
-                                        <input type="hidden" name="log_id" value="{{ log.id }}" id="logId">
+                                    <form action="{{ url_for('notifications') }}" method="post" class="hidden">
+                                        <input type="hidden" name="notif_id" value="{{ notif.id }}" id="logId">
                                         <button id="submit_button">Delete</button>
                                     </form>
                                     <button onclick="showModal()" class="bg-red-500 text-white rounded px-3 py-1">Delete</button>
@@ -53,7 +39,7 @@
                         {% endfor %}
                     {% else %}
                         <tr>
-                            <td class="border text-center py-1" colspan="9">No logs to show</td>
+                            <td class="border text-center py-1" colspan="9">No notifications to show</td>
                         </tr>
                     {% endif %}
                 </tbody>

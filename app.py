@@ -42,6 +42,13 @@ class visit_logs(db.Model):
     checkOut = db.Column(db.String(100), nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
+# visit logs table in database
+class Notifications(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    message = db.Column(db.String(100), nullable=False)
+    isRead = db.Column(db.Boolean, nullable=False, default=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
 # Register route
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -120,6 +127,7 @@ def history():
 
     # check out method 
     if request.method == 'POST':
+        userId = session.get('user_id')
         log_id = request.form.get('log_id')
         checkOutDateTime = request.form.get('checkedOut')
 
@@ -130,6 +138,11 @@ def history():
             flash('Check out successfully!', 'success')
         else:
             flash('Log not found or you do not have permission to update it.', 'error')
+
+        # inserts notifications data to database
+        new_notification = Notifications(message='Visitor Checkout Complete!', user_id=userId)
+        db.session.add(new_notification)
+        db.session.commit()
 
     logs = visit_logs.query.filter(visit_logs.user_id == userID).order_by(desc(visit_logs.checkIn)).all()
 
@@ -159,6 +172,11 @@ def checkin():
         db.session.add(new_visit)
         db.session.commit()
 
+        # inserts notifications data to database
+        new_notification = Notifications(message='New Visitor Alert!', user_id=userId)
+        db.session.add(new_notification)
+        db.session.commit()
+
         flash('Checked In Successfully!', 'success')
         return redirect(url_for('checkin'))
 
@@ -182,6 +200,22 @@ def admin():
     logs = visit_logs.query.order_by(desc(visit_logs.checkIn)).all()
 
     return render_template('Admin.html', logs=logs)
+
+@app.route('/notifications', methods=['GET', 'POST'])
+def notifications():
+    if 'user_id' not in session:
+        flash('You need to log in to access this page!', 'error')
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        log = Notifications.query.get(request.form.get('notif_id'))
+        db.session.delete(log)
+        db.session.commit()
+        flash('Deleted notifications successfully!', 'success')
+
+    notifications = Notifications.query.all()
+
+    return render_template('Notifications.html', notifications=notifications)
 
 # generate csv
 @app.route('/download-csv')
