@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import os
 import sqlite3
+from datetime import date
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -102,7 +103,7 @@ def login():
         if user.role == 'user':
             return redirect(url_for('home'))  
         else:
-            return redirect(url_for('admin'))  
+            return redirect(url_for('dashboard'))  
 
 
     return render_template('login.html')
@@ -140,7 +141,7 @@ def history():
             flash('Log not found or you do not have permission to update it.', 'error')
 
         # inserts notifications data to database
-        new_notification = Notifications(message='Visitor Checkout Complete!', user_id=userId)
+        new_notification = Notifications(message='Visitor Checkout Complete! A visitor has checked out for school visit. View details in the dashboard.!', user_id=userId)
         db.session.add(new_notification)
         db.session.commit()
 
@@ -173,7 +174,7 @@ def checkin():
         db.session.commit()
 
         # inserts notifications data to database
-        new_notification = Notifications(message='New Visitor Alert!', user_id=userId)
+        new_notification = Notifications(message='New Visitor Alert! Check the dashboard for details', user_id=userId)
         db.session.add(new_notification)
         db.session.commit()
 
@@ -185,7 +186,30 @@ def checkin():
     return render_template('CheckIn.html', userName=userName)
 
 #admin dashboard route
-@app.route('/admin', methods=['GET', 'POST'])
+@app.route('/dashboard', methods=['GET', 'POST'])
+def dashboard():
+    if 'user_id' not in session:
+        flash('You need to log in to access this page!', 'error')
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        log = visit_logs.query.get(request.form.get('log_id'))
+        db.session.delete(log)
+        db.session.commit()
+        flash('Deleted log successfully!', 'success')
+
+    # Get today's date
+    today = date.today()
+
+    # Filter logs by today's date for checkIn
+    logs = visit_logs.query.filter(db.func.date(visit_logs.checkIn) == today).order_by(desc(visit_logs.checkIn)).all()
+    allLogs = visit_logs.query.all()
+    users = User.query.all()
+
+    return render_template('Dashboard.html', logs=logs, allLogs=allLogs, users=users)
+
+#admin dashboard route
+@app.route('/logs', methods=['GET', 'POST'])
 def admin():
     if 'user_id' not in session:
         flash('You need to log in to access this page!', 'error')

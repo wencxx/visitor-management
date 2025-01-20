@@ -28,29 +28,35 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for log in logs %}
+                    {% if logs %}
+                        {% for log in logs %}
+                            <tr>
+                                <td class="border text-center py-1">{{ log.name }}</td>
+                                <td class="border text-center py-1">{{ log.gender }}</td>
+                                <td class="border text-center py-1">{{ log.age }}</td>
+                                <td class="border text-center py-1">{{ log.contact }}</td>
+                                <td class="border text-center py-1">{{ log.purpose }}</td>
+                                <td class="border text-center py-1">{{ log.toMeet }}</td>
+                                <td class="border text-center py-1">{{ log.checkIn | format_datetime }}</td>
+                                <td class="border text-center py-1">{{ log.checkOut | format_datetime }}</td>
+                                <td class="border text-center py-1">
+                                    {% if not log.checkOut %}
+                                        <form action="{{ url_for('history') }}" method="post">
+                                            <input type="hidden" name="log_id" value="{{ log.id }}">
+                                            <input type="datetime-local" class="hidden" name="checkedOut" value="" id="checkedOut">
+                                            <button class="bg-red-500 text-white rounded px-3 py-1">Checkout</button>
+                                        </form>
+                                    {% else %}
+                                        ---
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
                         <tr>
-                            <td class="border text-center py-1">{{ log.name }}</td>
-                            <td class="border text-center py-1">{{ log.gender }}</td>
-                            <td class="border text-center py-1">{{ log.age }}</td>
-                            <td class="border text-center py-1">{{ log.contact }}</td>
-                            <td class="border text-center py-1">{{ log.purpose }}</td>
-                            <td class="border text-center py-1">{{ log.toMeet }}</td>
-                            <td class="border text-center py-1">{{ log.checkIn | format_datetime }}</td>
-                            <td class="border text-center py-1">{{ log.checkOut | format_datetime }}</td>
-                            <td class="border text-center py-1">
-                                {% if not log.checkOut %}
-                                    <form action="{{ url_for('history') }}" method="post">
-                                        <input type="hidden" name="log_id" value="{{ log.id }}">
-                                        <input type="datetime-local" class="hidden" name="checkedOut" value="" id="checkedOut">
-                                        <button class="bg-red-500 text-white rounded px-3 py-1">Checkout</button>
-                                    </form>
-                                {% else %}
-                                    ---
-                                {% endif %}
-                            </td>
+                            <td colspan="9" class="border py-1 text-center">No history</td>
                         </tr>
-                    {% endfor %}
+                    {% endif %}
                 </tbody>
             </table>
         </div>
